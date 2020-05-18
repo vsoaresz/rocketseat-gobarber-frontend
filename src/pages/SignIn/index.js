@@ -1,16 +1,22 @@
 import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { Form } from '@unform/web';
 import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
+
+import { signInRequest } from '~/store/modules/auth/actions';
 
 import Input from '~/components/Form/Input';
 
 import logo from '~/assets/logo.svg';
 
 function SignIn() {
+  const dispatch = useDispatch();
+
   const formRef = useRef(null);
 
   async function handleSubmit(data, { reset }) {
+    const { email, password } = data;
     try {
       const schema = Yup.object().shape({
         email: Yup.string()
@@ -24,7 +30,12 @@ function SignIn() {
       await schema.validate(data, {
         abortEarly: false,
       });
+
+      // reseta o formulário
       reset();
+
+      // envia a action
+      dispatch(signInRequest(email, password));
     } catch (err) {
       const validationErrors = {};
 
