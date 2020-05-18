@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
@@ -6,10 +7,14 @@ import Input from '~/components/Form/Input';
 
 import logo from '~/assets/logo.svg';
 
+import { signUpRequest } from '~/store/modules/auth/actions';
+
 function SignUp() {
+  const dispatch = useDispatch();
+
   const formRef = useRef(null);
 
-  async function handleSubmit(data, { reset }) {
+  async function handleSubmit({ name, email, password }, { reset }) {
     try {
       const schema = Yup.object().shape({
         name: Yup.string().required('O nome é obrigatório'),
@@ -21,10 +26,17 @@ function SignUp() {
           .required('A senha é obrigatória.'),
       });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+      await schema.validate(
+        { name, email, password },
+        {
+          abortEarly: false,
+        }
+      );
+
+      // reset no formulátio;
       reset();
+
+      dispatch(signUpRequest(name, email, password));
     } catch (err) {
       const validationErrors = {};
 
